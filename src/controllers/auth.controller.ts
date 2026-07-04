@@ -5,6 +5,7 @@ import { HttpError } from '../utils/http-error.util';
 export class AuthController {
   private readonly authService = new AuthService();
 
+  // Muestra el login; si ya existe una sesion activa, evita volver a autenticarse.
   showLogin(req: Request, res: Response): void {
     if (req.session.user) {
       res.redirect('/dashboard');
@@ -17,6 +18,7 @@ export class AuthController {
     });
   }
 
+  // Valida credenciales, persiste la sesion y redirige al dashboard.
   async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const user = await this.authService.login(req.body);
@@ -44,6 +46,7 @@ export class AuthController {
     }
   }
 
+  // Cierra la sesion actual y regresa al formulario de acceso.
   logout(req: Request, res: Response): void {
     req.session.destroy(() => {
       res.redirect('/auth/login');

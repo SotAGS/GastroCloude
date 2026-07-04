@@ -7,6 +7,7 @@ import { AuthUser } from '../interfaces/auth-user.interface';
 export class AuthService {
   private readonly userRepository = new UserRepository();
 
+  // Ejecuta autenticacion completa: usuario, estado, password y permisos efectivos.
   async login(payload: LoginDto): Promise<AuthUser> {
     const user = await this.userRepository.findByUsernameOrEmail(payload.usernameOrEmail);
     if (!user) {

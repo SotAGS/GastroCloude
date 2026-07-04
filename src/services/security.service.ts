@@ -56,6 +56,7 @@ const DEFAULT_PERMISSIONS = [
 export class SecurityService {
   private readonly userRepository = new UserRepository();
 
+  // Catalogo base de permisos disponibles para asignar a roles.
   static getDefaultPermissions(): string[] {
     return [...DEFAULT_PERMISSIONS];
   }
@@ -227,6 +228,7 @@ export class SecurityService {
   }
 
   async updateRolePermissions(roleId: string, payload: UpdateRolePermissionsPayload): Promise<void> {
+    // Reemplaza en bloque los permisos del rol, validando que todos pertenezcan al catalogo permitido.
     const role = await Role.findByPk(roleId);
     if (!role) {
       throw new HttpError(404, 'Rol no encontrado.');
@@ -285,6 +287,7 @@ export class SecurityService {
   }
 
   private async ensureUniqueUserFields(username: string, email: string, excludeUserId?: string): Promise<void> {
+    // Impide duplicados de username/email al crear o editar usuarios.
     const normalizedUsername = username.trim();
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -316,6 +319,7 @@ export class SecurityService {
     nextRoleName: string | null,
     nextIsActive: boolean,
   ): Promise<void> {
+    // Regla de seguridad: nunca dejar el sistema sin al menos un ADMIN activo.
     if (currentRoleName !== 'ADMIN') {
       return;
     }
