@@ -1,0 +1,14 @@
+<header class="topbar">
+  <div>
+    <h1 class="topbar-title">GastroCloud</h1>
+    <p class="topbar-subtitle">Gestion inteligente para operaciones gastronomicas</p>
+  </div>
+  <div class="topbar-actions">
+    <% if (user) { %>
+      <span class="user-chip"><%= user.fullName %> · <%= user.role %></span>
+      <form method="post" action="/auth/logout">
+        <button class="btn btn-sm btn-outline-light" type="submit">Cerrar sesion</button>
+      </form>
+    <% } %>
+  </div>
+</header>

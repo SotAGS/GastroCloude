@@ -1,0 +1,209 @@
+<%- include('../layouts/app-shell', {
+  title: 'Seguridad y roles',
+  body: `
+    <section class="panel-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="section-title">Seguridad: usuarios, roles y permisos</h2>
+        <span class="status-pill">Solo ADMIN</span>
+      </div>
+
+      ${
+        error
+          ? `<div class="alert alert-danger mb-3" role="alert">${error}</div>`
+          : ''
+      }
+
+      <div class="d-flex gap-2 flex-wrap mb-3">
+        <form method="post" action="/seguridad/usuarios/empleado/reset-password">
+          <button class="btn btn-sm btn-outline-light" type="submit">Reset clave empleado a empleado123</button>
+        </form>
+      </div>
+
+      <h3 class="section-title h5 mb-2">Crear usuario</h3>
+      <form method="post" action="/seguridad/usuarios" class="row g-2 mb-4">
+        <div class="col-md-3">
+          <input class="form-control form-control-sm" name="fullName" placeholder="Nombre completo" required />
+        </div>
+        <div class="col-md-2">
+          <input class="form-control form-control-sm" name="username" placeholder="Usuario" required />
+        </div>
+        <div class="col-md-3">
+          <input class="form-control form-control-sm" type="email" name="email" placeholder="Email" required />
+        </div>
+        <div class="col-md-2">
+          <input class="form-control form-control-sm" type="password" name="password" placeholder="Contrasena" required />
+        </div>
+        <div class="col-md-2">
+          <select class="form-select form-select-sm" name="roleId" required>
+            ${(roles || [])
+              .map((role) => `<option value="${role.id}">${role.name}</option>`)
+              .join('')}
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-center">
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input" type="checkbox" name="isActive" checked />
+            <label class="form-check-label ms-2">Activo</label>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-sm btn-light w-100" type="submit">Crear</button>
+        </div>
+      </form>
+
+      <h3 class="section-title h5 mb-2">Usuarios</h3>
+
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Usuario</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Activo</th>
+              <th>Ultimo login</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(users || [])
+              .map(
+                (row) => `
+                  <tr>
+                    <td><input class="form-control form-control-sm" name="fullName" value="${row.fullName}" form="update-user-${row.id}" required /></td>
+                    <td><input class="form-control form-control-sm" name="username" value="${row.username}" form="update-user-${row.id}" required /></td>
+                    <td><input class="form-control form-control-sm" type="email" name="email" value="${row.email}" form="update-user-${row.id}" required /></td>
+                    <td>
+                      <select name="roleId" class="form-select form-select-sm" aria-label="Rol usuario ${row.username}" form="update-user-${row.id}">
+                          ${(roles || [])
+                            .map(
+                              (role) =>
+                                `<option value="${role.id}" ${row.roleId === role.id ? 'selected' : ''}>${role.name}</option>`,
+                            )
+                            .join('')}
+                      </select>
+                      </td>
+                      <td>
+                        <div class="form-check form-switch m-0">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="isActive"
+                            ${row.isActive ? 'checked' : ''}
+                            aria-label="Estado usuario ${row.username}"
+                          form="update-user-${row.id}"
+                          />
+                        </div>
+                      </td>
+                      <td>${row.lastLoginAt ? new Date(row.lastLoginAt).toLocaleString('es-AR') : '-'}</td>
+                      <td>
+                        <div class="d-flex gap-2">
+                        <input class="form-control form-control-sm" type="password" name="password" placeholder="Nueva clave (opcional)" form="update-user-${row.id}" />
+                        <form id="update-user-${row.id}" method="post" action="/seguridad/usuarios/${row.id}">
+                          <input type="hidden" name="_method" value="PUT" />
+                          <button class="btn btn-sm btn-outline-light" type="submit">Guardar</button>
+                        </form>
+                        <form method="post" action="/seguridad/usuarios/${row.id}" onsubmit="return confirm('Eliminar usuario ${row.username}?');">
+                          <input type="hidden" name="_method" value="DELETE" />
+                          <button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button>
+                        </form>
+                      </div>
+                      </td>
+                  </tr>
+                `,
+              )
+              .join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="my-4" />
+
+      <h3 class="section-title h5 mb-2">Roles</h3>
+      <form method="post" action="/seguridad/roles" class="row g-2 mb-3">
+        <div class="col-md-3">
+          <input class="form-control form-control-sm" name="name" placeholder="Nuevo rol (ej: CAJERO)" required />
+        </div>
+        <div class="col-md-5">
+          <input class="form-control form-control-sm" name="description" placeholder="Descripcion" />
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-sm btn-light w-100" type="submit">Crear rol</button>
+        </div>
+      </form>
+
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Rol</th>
+              <th>Descripcion</th>
+              <th>Permisos especificos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(roles || [])
+              .map(
+                (role) => `
+                  <tr>
+                    <td>
+                      <input class="form-control form-control-sm" name="name" value="${role.name}" form="update-role-${role.id}" required ${
+                          role.name === 'ADMIN' || role.name === 'EMPLEADO' ? 'readonly' : ''
+                        } />
+                    </td>
+                    <td>
+                      <input class="form-control form-control-sm" name="description" value="${role.description || ''}" form="update-role-${role.id}" />
+                    </td>
+                    <td>
+                      <form method="post" action="/seguridad/roles/${role.id}/permisos" id="permissions-role-${role.id}">
+                        <input type="hidden" name="_method" value="PATCH" />
+                        <div class="permission-grid">
+                          ${(availablePermissions || [])
+                            .map(
+                              (permission) => `
+                                <label class="form-check m-0">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="permissions[]"
+                                    value="${permission}"
+                                    ${role.permissions.includes(permission) ? 'checked' : ''}
+                                    ${role.name === 'ADMIN' ? 'disabled' : ''}
+                                  />
+                                  <span class="form-check-label small">${permission}</span>
+                                </label>
+                              `,
+                            )
+                            .join('')}
+                        </div>
+                        <button class="btn btn-sm btn-outline-light mt-2" type="submit" ${
+                          role.name === 'ADMIN' ? 'disabled' : ''
+                        }>Guardar permisos</button>
+                      </form>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-2">
+                        <form id="update-role-${role.id}" method="post" action="/seguridad/roles/${role.id}">
+                          <input type="hidden" name="_method" value="PUT" />
+                          <button class="btn btn-sm btn-outline-light" type="submit">Guardar rol</button>
+                        </form>
+                        <form method="post" action="/seguridad/roles/${role.id}" onsubmit="return confirm('Eliminar rol ${role.name}?');">
+                          <input type="hidden" name="_method" value="DELETE" />
+                          <button class="btn btn-sm btn-outline-danger" type="submit" ${
+                            role.name === 'ADMIN' || role.name === 'EMPLEADO' ? 'disabled' : ''
+                          }>Eliminar</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                `,
+              )
+              .join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `
+}) %>

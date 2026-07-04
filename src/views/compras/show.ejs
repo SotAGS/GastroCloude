@@ -1,0 +1,54 @@
+<%- include('../layouts/app-shell', {
+  title: 'Detalle de Compra',
+  body: `
+    <section class="panel-card">
+      <h2 class="section-title">Compra ${purchase.purchaseNumber}</h2>
+      <p>Estado actual: <span class="status-pill">${purchase.status}</span></p>
+      <p>Proveedor: ${purchase.supplier?.businessName || '-'}</p>
+      <p>Total: $ ${Number(purchase.total).toFixed(2)}</p>
+
+      <h4 class="mt-4">Detalles</h4>
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Costo</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(purchase.details || [])
+              .map(
+                (detail) => `
+                  <tr>
+                    <td>${detail.product?.name || detail.productId}</td>
+                    <td>${Number(detail.quantity).toFixed(3)}</td>
+                    <td>$ ${Number(detail.unitCost).toFixed(2)}</td>
+                    <td>$ ${Number(detail.lineTotal).toFixed(2)}</td>
+                  </tr>
+                `,
+              )
+              .join('')}
+          </tbody>
+        </table>
+      </div>
+
+      ${
+        purchase.status === 'PENDIENTE' && user?.role === 'ADMIN'
+          ? `
+            <div class="d-flex gap-2 mt-3">
+              <form method="post" action="/compras/${purchase.id}/estado/recibir">
+                <button class="btn btn-success" type="submit">Marcar como recibida</button>
+              </form>
+              <form method="post" action="/compras/${purchase.id}/estado/cancelar">
+                <button class="btn btn-outline-danger" type="submit">Cancelar compra</button>
+              </form>
+            </div>
+          `
+          : ''
+      }
+    </section>
+  `
+}) %>

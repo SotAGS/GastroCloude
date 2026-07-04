@@ -1,0 +1,36 @@
+<%- include('../layouts/app-shell', {
+  title: 'Home',
+  body: `
+    <section class="panel-card mb-3">
+      <h2 class="section-title mb-2">Home operativo</h2>
+      <p class="mb-0">Bienvenido, ${user?.fullName || 'Usuario'}. Desde aqui puedes controlar compras, stock y seguridad de la plataforma.</p>
+    </section>
+
+    <section class="dashboard-grid mb-3">
+      <article class="stat-card">
+        <h3>Compras</h3>
+        <p>Visualiza ordenes y su estado en tiempo real.</p>
+        <a href="/compras" class="btn btn-sm btn-outline-light">Ir a compras</a>
+      </article>
+      <article class="stat-card">
+        <h3>Stock</h3>
+        <p>Consulta niveles actuales y ultimos movimientos.</p>
+        <a href="/stock" class="btn btn-sm btn-outline-light">Ir a stock</a>
+      </article>
+      <article class="stat-card">
+        <h3>Seguridad</h3>
+        <p>${user?.role === 'ADMIN' ? 'Gestiona roles y permisos de usuarios.' : 'Acceso solo para administradores.'}</p>
+        ${user?.role === 'ADMIN' ? '<a href="/seguridad/usuarios" class="btn btn-sm btn-outline-light">Gestionar roles</a>' : ''}
+      </article>
+    </section>
+
+    <section class="panel-card">
+      <h3 class="section-title mb-2">Resumen de sesion</h3>
+      <div class="row g-2">
+        <div class="col-md-4"><span class="status-pill">Usuario: ${user?.fullName || '-'}</span></div>
+        <div class="col-md-4"><span class="status-pill">Rol: ${user?.role || '-'}</span></div>
+        <div class="col-md-4"><span class="status-pill">Estado: Activo</span></div>
+      </div>
+    </section>
+  `
+}) %>

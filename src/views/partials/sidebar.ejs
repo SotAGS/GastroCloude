@@ -1,0 +1,17 @@
+<aside class="sidebar">
+  <div class="brand-block">
+    <div class="brand-mark">GC</div>
+    <div>
+      <p class="brand-title">GastroCloud</p>
+      <p class="brand-subtitle">Abastecimiento</p>
+    </div>
+  </div>
+  <nav class="menu-nav">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/compras">Compras</a>
+    <a href="/stock">Stock</a>
+    <% if (user?.role === 'ADMIN') { %>
+      <a href="/seguridad/usuarios">Seguridad y roles</a>
+    <% } %>
+  </nav>
+</aside>

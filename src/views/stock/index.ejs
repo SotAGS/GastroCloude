@@ -1,0 +1,34 @@
+<%- include('../layouts/app-shell', {
+  title: 'Stock',
+  body: `
+    <section class="panel-card">
+      <h2 class="section-title mb-3">Stock actual</h2>
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Minimo</th>
+              <th>Ultimo movimiento</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(stockItems || [])
+              .map(
+                (stock) => `
+                  <tr>
+                    <td>${stock.product?.name || stock.productId}</td>
+                    <td>${Number(stock.currentQuantity).toFixed(3)}</td>
+                    <td>${Number(stock.minimumQuantity).toFixed(3)}</td>
+                    <td>${stock.lastMovementAt || '-'}</td>
+                  </tr>
+                `,
+              )
+              .join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `
+}) %>
